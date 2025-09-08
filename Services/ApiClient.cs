@@ -2,45 +2,42 @@
 using System.Text;
 using System.Net.Http.Headers;
 using AdvFullstack_Labb2.Services.IServices;
+using AdvFullstack_Labb2.Models;
+using AdvFullstack_Labb2.Helpers;
 
 namespace AdvFullstack_Labb2.Services
 {
     public class ApiClient : IApiClient
     {
-        private readonly HttpClient _client;
-        private string? _token;
-        // private static readonly JsonSerializerOptions...
+        private readonly IHttpClientFactory _clientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ApiClient(HttpClient client)
+        public ApiClient(IHttpClientFactory clientFactory, IHttpContextAccessor httpContextAccessor)
         {
-            _client = client;
+            _clientFactory = clientFactory;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public void SetToken(string token)
+        private HttpClient CreateClient()
         {
-            _token = token;
-        }
+            var client = _clientFactory.CreateClient("MyCafeApi");
 
-        private void AddAuthHeader()
-        {
-            if (!string.IsNullOrEmpty(_token))
+            var context = _httpContextAccessor.HttpContext;
+            if (context != null && context.Request.Cookies.TryGetValue("JWToken", out var token))
             {
-                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _token);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
-            else
-            {
-                _client.DefaultRequestHeaders.Authorization = null;
-            }
+
+            return client;
         }
 
         public async Task<List<TResponse>?> GetAllAsync<TResponse>(string uri)
             where TResponse : class
         {
-            AddAuthHeader();
+            var client = CreateClient();
+            var response = await client.GetAsync(uri);
 
-            var response = await _client.GetAsync(uri);
-            if (!response.IsSuccessStatusCode)
-                return null;
+            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<TResponse>>(json);
@@ -48,11 +45,10 @@ namespace AdvFullstack_Labb2.Services
         public async Task<TResponse?> GetByIdAsync<TResponse>(string uri)
             where TResponse : class
         {
-            AddAuthHeader();
+            var client = CreateClient();
+            var response = await client.GetAsync(uri);
 
-            var response = await _client.GetAsync(uri);
-            if (!response.IsSuccessStatusCode)
-                return null;
+            response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<TResponse>(json);
@@ -61,40 +57,38 @@ namespace AdvFullstack_Labb2.Services
             where TResponse : class
             where TRequest : class
         {
-            AddAuthHeader();
+            var client = CreateClient();
+            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(uri, content);
+            response.EnsureSuccessStatusCode();
 
-            var response = await _client.PostAsync(uri, content);
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResponse>(responseBody);
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(json);
         }
         public async Task<TResponse?> PutAsync<TRequest, TResponse>(string uri, TRequest data)
             where TResponse : class
             where TRequest : class
         {
-            AddAuthHeader();
+            var client = CreateClient();
+            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PutAsync(uri, content);
+            response.EnsureSuccessStatusCode();
 
-            var response = await _client.PutAsync(uri, content);
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResponse>(responseBody);
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<TResponse>(json);
         }
         public async Task<bool> DeleteAsync(string uri)
         {
-            AddAuthHeader();
+            var client = CreateClient();
 
-            var response = await _client.DeleteAsync(uri);
-            return response.IsSuccessStatusCode;
+            var response = await client.DeleteAsync(uri);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            return false;
         }
     }
 }

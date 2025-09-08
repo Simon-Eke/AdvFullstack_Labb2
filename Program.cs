@@ -10,22 +10,18 @@ namespace AdvFullstack_Labb2
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // httpclient<IApiClient, ApiClient>
-            builder.Services.AddHttpClient<IApiClient, ApiClient>("MyCafeApi", HttpClient => {
+            
+            builder.Services.AddHttpClient("MyCafeApi", HttpClient => {
                 HttpClient.BaseAddress = new Uri("https://localhost:7297/api/");
                 HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
+
+            builder.Services.AddScoped<IApiClient, ApiClient>();
+            builder.Services.AddScoped<IApiAuthClient, ApiAuthClient>();
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromMinutes(30);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
 
             var app = builder.Build();
 
@@ -42,8 +38,7 @@ namespace AdvFullstack_Labb2
 
             app.UseRouting();
 
-            app.UseSession();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             
@@ -54,6 +49,8 @@ namespace AdvFullstack_Labb2
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapFallbackToController("Index", "Home");
 
             app.Run();
         }
