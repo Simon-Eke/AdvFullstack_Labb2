@@ -1,5 +1,6 @@
 html {
   font-size: 14px;
+  font-palette: light;
 }
 
 @media (min-width: 768px) {
@@ -19,5 +20,16 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-color: lightcoral;
+  background-color: black;
+}
+
+.pixel-art {
+    width: 64px;
+    height: 64px;
+    image-rendering: pixelated;
+}
+.pixel-art-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
