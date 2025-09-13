@@ -6,6 +6,7 @@ namespace AdvFullstack_Labb2.Controllers
     {
         public IActionResult Index()
         {
+            // Get all menuItems
             return View();
         }
     }

@@ -21,6 +21,8 @@ namespace AdvFullstack_Labb2.Controllers
 
         public async Task<IActionResult> Index()
         {
+            // Get menuItems
+            // Select 3 menuItems that are also popular
             var tableList = await _client.GetAllAsync<Table>(ApiRoutes.Table.Base);
 
             return View(tableList);

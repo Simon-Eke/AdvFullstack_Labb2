@@ -10,7 +10,14 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
             : base(client) { }
         public IActionResult Index()
         {
+            // Get all tables
             return View();
         }
+
+        // Create
+        // Create
+        // Edit 
+        // Edit
+        // Delete
     }
 }

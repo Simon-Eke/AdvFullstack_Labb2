@@ -10,7 +10,10 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
             : base(client) { }
         public IActionResult Index()
         {
+            // Lista alla kunder
             return View();
         }
+
+        // Delete
     }
 }
