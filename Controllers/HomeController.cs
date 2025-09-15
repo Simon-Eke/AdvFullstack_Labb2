@@ -6,6 +6,7 @@ using AdvFullstack_Labb2.Helpers;
 using AdvFullstack_Labb2.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using AdvFullstack_Labb2.ViewModels.DisplayVMs;
 
 namespace AdvFullstack_Labb2.Controllers
 {
@@ -21,11 +22,20 @@ namespace AdvFullstack_Labb2.Controllers
 
         public async Task<IActionResult> Index()
         {
+            var menuItems = await _client.GetAllAsync<MenuItem>(ApiRoutes.MenuItem.Base);
             // Get menuItems
+            var topThreeMenuItems = menuItems
+                .Where(mi => mi.IsPopular == true)
+                .Take(3)
+                .Select(mi => new MenuItemPublicVM
+                {
+                    Name = mi.Name,
+                    Price = mi.Price,
+                    ImageUrl = mi.ImageUrl
+                }).ToList();
             // Select 3 menuItems that are also popular
-            var tableList = await _client.GetAllAsync<Table>(ApiRoutes.Table.Base);
 
-            return View(tableList);
+            return View(topThreeMenuItems);
         }
     }
 }

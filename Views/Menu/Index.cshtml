@@ -1,15 +1,14 @@
 ﻿@using AdvFullstack_Labb2.ViewModels.DisplayVMs
-@{
-    ViewData["Title"] = "Home Page";
-}
-
 @model List<MenuItemPublicVM>
+
+@{
+    ViewData["Title"] = "Meny";
+}
 
 <section class="text-center">
 
     <header class="text-center m-5">
-        <h1 class="display-4">Pacman Café</h1>
-        <p class="lead">Välkom-nom-nom-men till Pacman-Caféet! Vi rekommenderar starkt vår nya kaka Michael's Cookie samt vårt nya goda te Oliver's School Brew! Se våra populära menyval nedan</p>
+        <h1 class="display-4">Meny</h1>
     </header>
     @if (Model != null && Model.Any())
     {
@@ -18,13 +17,13 @@
                 @foreach (var menuItem in Model)
                 {
                     var imageUrl = string.IsNullOrEmpty(menuItem.ImageUrl) || menuItem.ImageUrl?.ToLower() == "none"
-                        ? "https://placehold.co/200?text=Ingen+Bild&font=lora"
-                        : menuItem.ImageUrl;
-                    
-                    
-                    <div class="col-md-4 mb-4" >
+                    ? "https://placehold.co/100?text=Ingen+Bild&font=lora"
+                    : menuItem.ImageUrl;
+
+
+                    <div class="col-md-3 mb-4">
                         <div class="card h-100 shadow-sm">
-                            <img src="@imageUrl" class="card-img-top" alt="@menuItem.Name" style="object-fit: cover; height: 200px;"/>
+                            <img src="@imageUrl" class="card-img-top" alt="@menuItem.Name" style="object-fit: cover; height: 100px;" />
                             <div class="card-body">
                                 <h5 class="card-title">@menuItem.Name</h5>
                                 <p class="card-text fw-bold text-success">
