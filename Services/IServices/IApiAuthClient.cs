@@ -1,7 +1,9 @@
-﻿namespace AdvFullstack_Labb2.Services.IServices
+﻿using AdvFullstack_Labb2.Models;
+
+namespace AdvFullstack_Labb2.Services.IServices
 {
     public interface IApiAuthClient
     {
-        Task<string?> LoginAsync(string username, string password);
+        Task<string?> LoginAsync(LoginRequest loginRequest);
     }
 }

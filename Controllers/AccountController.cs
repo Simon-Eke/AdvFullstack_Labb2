@@ -1,4 +1,6 @@
-﻿using AdvFullstack_Labb2.Services.IServices;
+﻿using AdvFullstack_Labb2.Models;
+using AdvFullstack_Labb2.Services.IServices;
+using AdvFullstack_Labb2.ViewModels.EditCreateVMs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdvFullstack_Labb2.Controllers
@@ -17,14 +19,26 @@ namespace AdvFullstack_Labb2.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login([FromForm] string username, [FromForm] string password)
+        public async Task<IActionResult> Login(LoginFormVM vm)
         {
-            var jwt = await _client.LoginAsync(username, password);
+
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+
+            var loginRequest = new LoginRequest
+            {
+                Username = vm.Username,
+                Password = vm.Password
+            };
+
+            var jwt = await _client.LoginAsync(loginRequest);
 
             if (jwt == null)
             {
-                ModelState.AddModelError("", "Invalid Login");
-                return View();
+                ModelState.AddModelError("", "Logga in misslyckades! Ditt lösenord och/eller användarnamn är felaktigt.");
+                return View(vm);
             }
 
             Response.Cookies.Append("JWToken", jwt, new CookieOptions

@@ -16,15 +16,9 @@ namespace AdvFullstack_Labb2.Services
         }
 
         // Make an auth apiclient if more endpoints than loginasync
-        public async Task<string?> LoginAsync(string username, string password)
+        public async Task<string?> LoginAsync(LoginRequest loginRequest)
         {
             var client = _clientFactory.CreateClient("MyCafeApi");
-
-            var loginRequest = new LoginRequest
-            {
-                Username = username,
-                Password = password
-            };
 
             var json = JsonConvert.SerializeObject(loginRequest);
             var content = new StringContent(json, Encoding.UTF8, "application/json");

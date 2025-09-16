@@ -9,7 +9,6 @@ namespace AdvFullstack_Labb2
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
             
             builder.Services.AddHttpClient("MyCafeApi", HttpClient => {
                 HttpClient.BaseAddress = new Uri("https://localhost:7297/api/");

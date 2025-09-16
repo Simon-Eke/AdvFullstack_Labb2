@@ -28,10 +28,12 @@
 	2. Table should be quite easy
 	3. Customers isnt required
 	4. Admins is needed since I dont have a register
-- Public routes: 
+- Public routes: DONE
 	1. Do HomeController with description and top 3 menuItems - DONE
 
 	2. Do menuController - straight view - DONE
+	
+	3. Do AccountController - DONE
 - Layout.cshtml:
 
 	1. Ensure navigation to Booking (the public route) 
