@@ -10,7 +10,7 @@ using System.Text;
 namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class MenuItemsController : BaseController
+    public class MenuItemsController : BaseAdminController
     {
         public MenuItemsController(IApiClient client)
             : base(client) { }
@@ -31,7 +31,7 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(MenuItemEditVM vm)
+        public async Task<IActionResult> Create(MenuItemAdminVM vm)
         {
             if (!ModelState.IsValid)
             {
@@ -57,10 +57,9 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
                 return View(vm);
             }
 
-            // TempData["Success"] = $"Created new Menu item with id {response.Id}";
+            TempData["Success"] = $"Created new Menu item with id {response.Id}";
             return RedirectToAction("Index");
         }
-
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -69,7 +68,7 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 
             if (menuItem == null)
             {
-                // TempData["Error"] = $"Failed to fetch Menu item with id: {id}";
+                TempData["Error"] = $"Failed to fetch Menu item with id: {id}";
                 return RedirectToAction("Index");
             }
 
@@ -107,6 +106,7 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 
             var response = await _client.PutAsync<MenuItem, object>(ApiRoutes.MenuItem.GetById(menuItem.Id), menuItem);
 
+            TempData["Success"] = $"Updated Menu item with id: {vm.Id}";
             return RedirectToAction("Index");
         }
 
@@ -119,10 +119,11 @@ namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 
             if (!success)
             {
-                // TempData["Error"] = $"Failed to delete Menu item with id {id}";
+                TempData["Error"] = $"Failed to delete Menu item with id {id}";
                 return RedirectToAction("Index");
             }
-            // TempData["Success"] = $"Deleted Menu item with id: {id}";
+
+            TempData["Success"] = $"Deleted Menu item with id: {id}";
             return RedirectToAction("Index");
         }
     }

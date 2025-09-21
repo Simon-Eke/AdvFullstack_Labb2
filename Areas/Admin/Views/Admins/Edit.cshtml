@@ -1,0 +1,69 @@
+﻿@using AdvFullstack_Labb2.ViewModels.EditCreateVMs
+@model AdminEditVM
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit Admin</h1>
+
+@if (Model.Step == EditStep.PasswordConfirm)
+{
+    <div class="bg-warning m-3">
+        <h2>Skriv in ditt nuvarande lösenord för att fortsätta uppdatera dina uppgifter.</h2>
+    </div>
+    <form asp-action="ConfirmPassword" method="post">
+        <input asp-for="Id"/>
+        <input type="hidden" asp-for="Username" />
+
+        <div class="form-group">
+            <label asp-for="Username"></label>
+            <input type="text" value="@Model.Username" class="form-control" readonly />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CurrentPassword"></label>
+            <input type="password" asp-for=CurrentPassword class="form-control" />
+            <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <button type="submit" class="btn btn-primary mt-3">Verify Password</button>
+    </form>
+}
+else if (Model.Step == EditStep.EditForm)
+{
+    <div class="bg-success m-3">
+        <h2>Lösenordet har bekräftats, du kan nu uppdatera dina uppgifter.</h2>
+    </div>
+    <form asp-action="Update" method="post">
+        <input asp-for="Id"/>
+        <input type="hidden" asp-for="Step"/>
+
+        <div class="form-group">
+            <label asp-for="Username"></label>
+            <input asp-for=Username class="form-control" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="NewPassword"></label>
+            <input type="password" asp-for=NewPassword class="form-control"/>
+            <span asp-validation-for="NewPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ConfirmNewPassword"></label>
+            <input type="password" asp-for=ConfirmNewPassword class="form-control" />
+            <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+        </div>
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <button type="submit" class="btn btn-primary mt-3">Update Admin</button>
+    </form>
+}
+
+

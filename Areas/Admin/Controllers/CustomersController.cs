@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CustomersController : BaseController
+    public class CustomersController : BaseAdminController
     {
         public CustomersController(IApiClient client)
             : base(client) { }

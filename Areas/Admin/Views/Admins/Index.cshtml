@@ -1,5 +1,5 @@
 ﻿@using AdvFullstack_Labb2.ViewModels.DisplayVMs;
-@model List<MenuItemAdminVM>
+@model List<AdminVM>
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -12,7 +12,7 @@
     }
 </style>
 
-<h1>Menyvaror</h1>
+<h1>Administratörer</h1>
 
 <section>
     <div class="text-center">
@@ -21,29 +21,19 @@
     <table class="table table-bordered table-hover table-striped text-center bg-white">
         <thead class="table-light">
             <tr>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Is Popular?</th>
-                <th>Image Url</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>Användarnamn</th>
+                <th>Lösenord</th>
+                <th>Ändra</th>
+                <th>Ta bort</th>
             </tr>
         </thead>
         <tbody>
-            @foreach(var item in Model)
+            @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Price.ToString("C")</td>
-                    <td>@(item.IsPopular? "Yes" : "No")</td>
-                    @{
-                        var imageUrl = item.ImageUrl?.ToLower() == "none"
-                        ? "https://placehold.co/50"
-                        : item.ImageUrl;
-                    }
-                    <td>
-                        <img src="@item.ImageUrl" alt="Image" width="50" height="50" style="object-fit: cover" onerror="this.onerror=null; this.src='https://placehold.co/50';" />
-                    </td>
+                    <td>@item.Username</td>
+                    <td >********</td>
+                    
                     <td>
                         <a asp-action="Edit" asp-route-id=@item.Id
                            class="btn btn-sm btn-warning">Edit</a>

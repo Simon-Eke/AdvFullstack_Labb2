@@ -49,6 +49,8 @@ namespace AdvFullstack_Labb2.Controllers
                 Expires = DateTimeOffset.UtcNow.AddHours(1)
             });
 
+            TempData["Success"] = "Inloggning lyckades!";
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -57,6 +59,7 @@ namespace AdvFullstack_Labb2.Controllers
         public IActionResult Logout()
         {
             Response.Cookies.Delete("JWToken");
+            TempData["Success"] = "Utloggning lyckades!";
             return RedirectToAction("Index", "Home");
         }
 

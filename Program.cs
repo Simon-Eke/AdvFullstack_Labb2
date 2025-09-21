@@ -1,3 +1,4 @@
+using AdvFullstack_Labb2.Filters;
 using AdvFullstack_Labb2.Services;
 using AdvFullstack_Labb2.Services.IServices;
 using System.Net.Http.Headers;
@@ -18,7 +19,10 @@ namespace AdvFullstack_Labb2
             builder.Services.AddScoped<IApiClient, ApiClient>();
             builder.Services.AddScoped<IApiAuthClient, ApiAuthClient>();
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<ApiExceptionFilter>();
+            });
             builder.Services.AddHttpContextAccessor();
 
 

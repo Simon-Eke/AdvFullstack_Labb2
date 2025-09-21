@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace AdvFullstack_Labb2.Areas.Admin.Controllers
 {
-    public class BaseController : Controller
+    public class BaseAdminController : Controller
     {
         protected readonly IApiClient _client;
-        public BaseController(IApiClient client) 
+        public BaseAdminController(IApiClient client) 
         {
             _client = client;
         }

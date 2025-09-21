@@ -31,5 +31,7 @@
         <span asp-validation-for="ImageUrl" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Edit</button>
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <button type="submit" class="btn btn-primary mt-3">Edit</button>
 </form>

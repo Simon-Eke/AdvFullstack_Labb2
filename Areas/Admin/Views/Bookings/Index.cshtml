@@ -1,0 +1,83 @@
+﻿@model IEnumerable<AdvFullstack_Labb2.ViewModels.DisplayVMs.BookingVM>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bookings";
+}
+
+<style>
+    table td, table th {
+        vertical-align: middle;
+    }
+</style>
+
+<h1>Bokningar</h1>
+
+<section>
+    <div class="text-center">
+        <a class="btn btn-success m-3" asp-action="Create">Create New</a>
+    </div>
+    <table class="table table-bordered table-hover table-striped text-center bg-white">
+        <thead class="table-light">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PhoneNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Seatings)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CustomerAmount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TableNumber)
+                </th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Seatings)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CustomerAmount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TableNumber)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id=@item.Id class="btn btn-sm btn-warning">Edit</a>
+                    </td>
+                    <td>
+                        <form asp-action="Delete" method="Post" class="d-inline">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this item?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</section>
