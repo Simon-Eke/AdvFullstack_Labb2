@@ -44,7 +44,7 @@
 
 - JWT - DONE
 - Change UI to be at least readable - done i guess....
-- Pacman stuff is not responsive for smaller screens..........
+- SEO for menu and home page - DONE
 - Move the the public reused MenuItemCard into a partial view
 
 ## Dev Notes:

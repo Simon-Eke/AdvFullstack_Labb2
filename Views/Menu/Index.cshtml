@@ -2,7 +2,8 @@
 @model List<MenuItemPublicVM>
 
 @{
-    ViewData["Title"] = "Meny";
+    ViewData["Title"] = "Meny | Pacman Café";
+    ViewData["MetaDescription"] = "Utforska vår meny på Pacman Café. Allt från hembakta kakor till goda drycker – något för alla smaker!";
 }
 
 <section class="text-center">
@@ -23,7 +24,7 @@
 
                     <div class="col-md-3 mb-4">
                         <div class="card h-100 shadow-sm">
-                            <img src="@imageUrl" class="card-img-top" alt="@menuItem.Name" style="object-fit: cover; height: 100px;" />
+                            <img src="@imageUrl" class="card-img-top" alt="@menuItem.Name" style="object-fit: cover; height: 100px;" loading="lazy"/>
                             <div class="card-body">
                                 <h5 class="card-title">@menuItem.Name</h5>
                                 <p class="card-text fw-bold text-success">
