@@ -11,11 +11,12 @@ namespace AdvFullstack_Labb2.Services
     {
         private readonly IHttpClientFactory _clientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public ApiClient(IHttpClientFactory clientFactory, IHttpContextAccessor httpContextAccessor)
+        private readonly ILogger<ApiClient> _logger;
+        public ApiClient(IHttpClientFactory clientFactory, IHttpContextAccessor httpContextAccessor, ILogger<ApiClient> logger)
         {
             _clientFactory = clientFactory;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         private HttpClient CreateClient()
@@ -34,61 +35,141 @@ namespace AdvFullstack_Labb2.Services
         public async Task<List<TResponse>?> GetAllAsync<TResponse>(string uri)
             where TResponse : class
         {
-            var client = CreateClient();
-            var response = await client.GetAsync(uri);
+            try
+            {
+                var client = CreateClient();
+                var response = await client.GetAsync(uri);
 
-            response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("API request failed: {StatusCode} for URI: {Uri}", response.StatusCode, uri);
+                    throw new HttpRequestException($"API request failed with status {response.StatusCode}: {response.ReasonPhrase}");
+                }
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<TResponse>>(json);
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<List<TResponse>>(json);
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError("API request timed out for URI: {Uri}", uri);
+                throw new TaskCanceledException("The API request timed out", ex);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request exception for URI: {Uri}", uri);
+                throw;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON deserialization error for URI: {Uri}", uri);
+                throw new JsonException("Failed to deserialize API response", ex);
+            }
         }
+
         public async Task<TResponse?> GetByIdAsync<TResponse>(string uri)
             where TResponse : class
         {
-            var client = CreateClient();
-            var response = await client.GetAsync(uri);
+            try
+            {
+                var client = CreateClient();
+                var response = await client.GetAsync(uri);
 
-            response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("API request failed: {StatusCode} for URI: {Uri}", response.StatusCode, uri);
+                    throw new HttpRequestException($"API request failed with status {response.StatusCode}: {response.ReasonPhrase}");
+                }
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResponse>(json);
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<TResponse>(json);
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError("API request timed out for URI: {Uri}", uri);
+                throw new TaskCanceledException("The API request timed out", ex);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP request exception for URI: {Uri}", uri);
+                throw;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "JSON deserialization error for URI: {Uri}", uri);
+                throw new JsonException("Failed to deserialize API response", ex);
+            }
         }
+
         public async Task<TResponse?> PostAsync<TRequest, TResponse>(string uri, TRequest data)
             where TResponse : class
             where TRequest : class
         {
-            var client = CreateClient();
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            try
+            {
+                var client = CreateClient();
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(uri, content);
 
-            var response = await client.PostAsync(uri, content);
-            response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("API POST request failed: {StatusCode} for URI: {Uri}", response.StatusCode, uri);
+                    throw new HttpRequestException($"API request failed with status {response.StatusCode}: {response.ReasonPhrase}");
+                }
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResponse>(json);
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<TResponse>(json);
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError("API POST request timed out for URI: {Uri}", uri);
+                throw new TaskCanceledException("The API request timed out", ex);
+            }
         }
         public async Task<TResponse?> PutAsync<TRequest, TResponse>(string uri, TRequest data)
             where TResponse : class
             where TRequest : class
         {
-            var client = CreateClient();
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            try
+            {
+                var client = CreateClient();
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var response = await client.PutAsync(uri, content);
-            response.EnsureSuccessStatusCode();
+                var response = await client.PutAsync(uri, content);
 
-            var json = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<TResponse>(json);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("API PUT request failed: {StatusCode} for URI: {Uri}", response.StatusCode, uri);
+                    throw new HttpRequestException($"API request failed with status {response.StatusCode}: {response.ReasonPhrase}");
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<TResponse>(json);
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError("API PUT request timed out for URI: {Uri}", uri);
+                throw new TaskCanceledException("The API request timed out", ex);
+            }
         }
         public async Task<bool> DeleteAsync(string uri)
         {
-            var client = CreateClient();
+            try
+            {
+                var client = CreateClient();
 
-            var response = await client.DeleteAsync(uri);
+                var response = await client.DeleteAsync(uri);
 
-            if (response.IsSuccessStatusCode)
-                return true;
+                if (response.IsSuccessStatusCode)
+                    return true;
 
-            return false;
+                _logger.LogWarning("API DELETE request failed: {StatusCode} for URI: {Uri}", response.StatusCode, uri);
+                return false;
+            }
+            catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
+            {
+                _logger.LogError("API DELETE request timed out for URI: {Uri}", uri);
+                throw new TaskCanceledException("The API request timed out", ex);
+            }
         }
     }
 }

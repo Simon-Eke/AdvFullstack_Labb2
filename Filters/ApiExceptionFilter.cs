@@ -22,8 +22,17 @@ namespace AdvFullstack_Labb2.Filters
 
     public class ApiExceptionFilter : IExceptionFilter
     {
+        private readonly ILogger<ApiExceptionFilter> _logger;
+
+        public ApiExceptionFilter(ILogger<ApiExceptionFilter> logger)
+        {
+            _logger = logger;
+        }
         public void OnException(ExceptionContext context)
         {
+            _logger.LogError(context.Exception, "Exception occurred in controller: {Controller}, Action: {Action}",
+                context.RouteData.Values["controller"], context.RouteData.Values["action"]);
+
             if (context.Exception is HttpRequestException httpEx)
             {
                 // Handle HTTP exceptions from your ApiClient calls
@@ -41,6 +50,18 @@ namespace AdvFullstack_Labb2.Filters
                 // Handle JSON deserialization errors
                 HandleJsonException(context);
             }
+            else if (context.Exception is InvalidOperationException invalidOpEx &&
+                    invalidOpEx.Message.Contains("The view") &&
+                    invalidOpEx.Message.Contains("was not found"))
+            {
+                _logger.LogWarning(invalidOpEx, "Missing view encountered");
+
+                SetTempDataAndRedirect(context,
+                    "The page you're trying to access does not exist or the view is missing.",
+                    "ViewMissing");
+
+                return;
+            }
         }
 
         private void HandleHttpRequestException(ExceptionContext context, HttpRequestException httpEx)
@@ -50,6 +71,8 @@ namespace AdvFullstack_Labb2.Filters
 
             if (message.Contains("401") || message.Contains("unauthorized"))
             {
+                context.HttpContext.Response.Cookies.Delete("JWToken");
+                _logger.LogWarning("Unauthorized access attempt, redirecting to login");
                 // JWT token might be expired or invalid
                 context.Result = new RedirectToActionResult("Login", "Account", new { area = "" });
             }
@@ -71,7 +94,7 @@ namespace AdvFullstack_Labb2.Filters
             else
             {
                 // Generic HTTP error
-                SetTempDataAndRedirect(context, "Service temporarily unavailable. Please try again.");
+                SetTempDataAndRedirect(context, "Service temporarily unavailable. Please try again.", "ApiDown");
             }
 
             context.ExceptionHandled = true;
@@ -79,17 +102,23 @@ namespace AdvFullstack_Labb2.Filters
 
         private void HandleTimeoutException(ExceptionContext context)
         {
-            SetTempDataAndRedirect(context, "Request timed out. Please try again.");
+            _logger.LogWarning("Request timed out for controller: {Controller}, Action: {Action}",
+            context.RouteData.Values["controller"], context.RouteData.Values["action"]);
+
+            SetTempDataAndRedirect(context, "The service is taking too long to respond. Please try again.", "Timeout");
             context.ExceptionHandled = true;
         }
 
         private void HandleJsonException(ExceptionContext context)
         {
-            SetTempDataAndRedirect(context, "Invalid response from server. Please try again.");
+            _logger.LogError("JSON deserialization error in controller: {Controller}, Action: {Action}",
+            context.RouteData.Values["controller"], context.RouteData.Values["action"]);
+
+            SetTempDataAndRedirect(context, "Invalid response from server. Please try again.", "JsonError");
             context.ExceptionHandled = true;
         }
 
-        private void SetTempDataAndRedirect(ExceptionContext context, string errorMessage)
+        private void SetTempDataAndRedirect(ExceptionContext context, string errorMessage, string errorType = "General")
         {
             var controller = context.RouteData.Values["controller"]?.ToString();
             var area = context.RouteData.Values["area"]?.ToString();
@@ -101,24 +130,29 @@ namespace AdvFullstack_Labb2.Filters
                 var tempDataFactory = context.HttpContext.RequestServices.GetRequiredService<ITempDataDictionaryFactory>();
                 var tempData = tempDataFactory.GetTempData(context.HttpContext);
                 tempData["Error"] = errorMessage;
+                tempData["ErrorType"] = errorType;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("ApiExceptionFilter Error: Couldn't access data through service provider.");
+                _logger.LogError(ex, "Couldn't set TempData in ApiExceptionFilter");
             }
             
 
             // Determine where to redirect based on area
             if (!string.IsNullOrEmpty(area) && area.Equals("Admin", StringComparison.OrdinalIgnoreCase))
             {
+                // quick fix
+                context.Result = new RedirectToActionResult("ErrorApiDown", "Home", new { area = "" });
                 // Redirect to admin area index
-                context.Result = new RedirectToActionResult("Index", controller ?? "Admins", new { area = "Admin" });
+                // context.Result = new RedirectToActionResult("Index", controller ?? "Admins", new { area = "Admin" });
             }
             else
             {
                 // Redirect to main area
-                context.Result = new RedirectToActionResult("Index", "Home", new { area = "" });
+                context.Result = new RedirectToActionResult("ErrorApiDown", "Home", new { area = "" });
             }
+
+            context.ExceptionHandled = true;
         }
     }
 }

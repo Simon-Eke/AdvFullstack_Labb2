@@ -37,6 +37,8 @@ namespace AdvFullstack_Labb2
                 app.UseHsts();
             }
 
+            app.UseExceptionHandler("/Home/HandleException");
+
             app.UseStatusCodePagesWithReExecute("/Home/StatusCode/{0}");
 
             app.UseHttpsRedirection();

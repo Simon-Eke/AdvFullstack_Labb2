@@ -1,6 +1,25 @@
 ﻿@if (!string.IsNullOrWhiteSpace(TempData["Error"] as string))
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    var errorType = TempData["ErrorType"]?.ToString() ?? "General";
+
+    var alertClass = errorType switch
+    {
+        "ApiDown" => "alert-danger",
+        "Timeout" => "alert-warning",
+        "JsonError" => "alert-info",
+        _ => "alert-danger"
+    };
+
+    <div class="alert @alertClass alert-dismissible fade show" role="alert">
+        <strong>
+            @(errorType switch 
+            {
+                "ApiDown" => "Service Unavailable:",
+                "Timeout" => "Timeout:",
+                "JsonError" => "Data Error:",
+                _ => "Error:"
+            })
+        </strong>
         @TempData["Error"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -18,6 +37,14 @@
 {
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
         @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(TempData["Info"] as string))
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        @TempData["Info"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
