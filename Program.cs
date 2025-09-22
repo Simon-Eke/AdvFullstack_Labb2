@@ -14,6 +14,7 @@ namespace AdvFullstack_Labb2
             builder.Services.AddHttpClient("MyCafeApi", HttpClient => {
                 HttpClient.BaseAddress = new Uri("https://localhost:7297/api/");
                 HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                HttpClient.Timeout = TimeSpan.FromSeconds(10);
             });
 
             builder.Services.AddScoped<IApiClient, ApiClient>();
@@ -36,6 +37,8 @@ namespace AdvFullstack_Labb2
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithReExecute("/Home/StatusCode/{0}");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -53,7 +56,6 @@ namespace AdvFullstack_Labb2
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.MapFallbackToController("Index", "Home");
 
             app.Run();
         }
